@@ -1,0 +1,15 @@
+# ignore idea
+**/.idea/
+**/__pycache__/
+
+# ignore packaging files
+**/build/
+**/dist/
+**/*.egg-info/
+
+# setting and reporting files
+**/.coverage
+**/_trial_temp
+
+# ignore configuration files
+*.cfg
