@@ -117,6 +117,7 @@ def my_predict_gmm_soft(X, gmm, merged) -> np.ndarray:
 
     for merge_each in merged:
         x_probs[:, merge_each[0]] += x_probs[:, merge_each[1]]
+        # x_probs[:, merge_each[0]] = np.maximum(x_probs[:, merge_each[0]], x_probs[:, merge_each[1]])
         x_probs[:, merge_each[1]] = 0
     return x_probs
 
@@ -167,9 +168,13 @@ def plot_contours(x_grid, y_grid, gmm, merged, best_k):
 def main_execution(X):
 
     like_vec = list()
-    bics = default_bic(data=X, ks=range(1, 20))
-    # plt.plot(bics)
-    best_k = np.argmin(bics)
+    k_range = range(1, 20)
+    bics = default_bic(data=X, ks=k_range)
+    plt.figure()
+    plt.plot(k_range, bics)
+    plt.xticks(k_range)
+    best_k = np.argmin(bics) + 1
+
     print(best_k)
     gmm = mixture.GaussianMixture(n_components=best_k, covariance_type=COV_TYPE, random_state=1)
     gmm.fit(X)
@@ -181,7 +186,6 @@ def main_execution(X):
     y_max = max(X[:, 1])
     x_grid = np.arange(x_min, x_max, 0.1)
     y_grid = np.arange(y_min, y_max, 0.1)
-    xx, yy = np.meshgrid(x_grid, y_grid, sparse=True)
     for aux in range(best_k):
         ent_list.append(total_entropy(X, gmm, merged=merge_list))
 
