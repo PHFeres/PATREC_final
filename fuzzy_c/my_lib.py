@@ -165,27 +165,20 @@ def plot_contours(x_grid, y_grid, gmm, merged, best_k):
         plt.contour(x_grid, y_grid, contour, levels=[0.6], colors=[color_vec(aux_k)])
 
 
-def main_execution(X):
+def main_execution_gmm(X):
 
     like_vec = list()
-    k_range = range(1, 20)
-    bics = default_bic(data=X, ks=k_range)
-    plt.figure()
-    plt.plot(k_range, bics)
-    plt.xticks(k_range)
-    best_k = np.argmin(bics) + 1
+
+    best_k = get_best_k_bic(X)
 
     print(best_k)
     gmm = mixture.GaussianMixture(n_components=best_k, covariance_type=COV_TYPE, random_state=1)
     gmm.fit(X)
     ent_list = list()
     merge_list = list()
-    x_min = min(X[:, 0])
-    y_min = min(X[:, 1])
-    x_max = max(X[:, 0])
-    y_max = max(X[:, 1])
-    x_grid = np.arange(x_min, x_max, 0.1)
-    y_grid = np.arange(y_min, y_max, 0.1)
+
+    x_grid, y_grid = get_plot_limits(X)
+
     for aux in range(best_k):
         ent_list.append(total_entropy(X, gmm, merged=merge_list))
 
@@ -206,3 +199,23 @@ def main_execution(X):
     print(ent_list)
 
     plt.show()
+
+
+def get_plot_limits(X):
+    x_min = min(X[:, 0])
+    y_min = min(X[:, 1])
+    x_max = max(X[:, 0])
+    y_max = max(X[:, 1])
+    x_grid = np.arange(x_min, x_max, 0.1)
+    y_grid = np.arange(y_min, y_max, 0.1)
+    return x_grid, y_grid
+
+
+def get_best_k_bic(X):
+    k_range = range(1, 20)
+    bics = default_bic(data=X, ks=k_range)
+    plt.figure()
+    plt.plot(k_range, bics)
+    plt.xticks(k_range)
+    best_k = np.argmin(bics) + 1
+    return best_k
